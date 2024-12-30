@@ -1,11 +1,22 @@
 ---
+import { NUMBER_OF_POSTS_PER_PAGE } from '../server-constants.ts'
+import {
+  getPosts,
+  getRankedPosts,
+  getAllTags,
+  getNumberOfPages,
+} from '../lib/notion/client.ts'
 import { PUBLIC_GA_TRACKING_ID, ENABLE_LIGHTBOX } from '../server-constants.ts'
 import { getDatabase } from '../lib/notion/client.ts'
 import { getNavLink, getStaticFilePath, filePath } from '../lib/blog-helpers.ts'
 import '../styles/syntax-coloring.css'
 import GoogleAnalytics from '../components/GoogleAnalytics.astro'
 import SearchModal from '../components/SearchModal.astro'
+import Hamburger from '../components/Hamburger.astro';
+import BlogTagsLink from '../components/BlogTagsLink.astro'
+import ClapLink from  '../components/ClapLink.astro'
 import SearchButton from '../components/SearchButton.astro'
+import Profile from  '../components/Profile.astro'
 
 export interface Props {
   title: string
@@ -25,6 +36,12 @@ const siteOGImage = new URL(
   getStaticFilePath('/default-og-image.png'),
   Astro.site
 )
+const [posts, rankedPosts, tags, numberOfPages] = await Promise.all([
+  getPosts(NUMBER_OF_POSTS_PER_PAGE),
+  getRankedPosts(),
+  getAllTags(),
+  getNumberOfPages(),
+])
 
 let coverImageURL: string
 if (database.Cover) {
@@ -77,8 +94,7 @@ if (database.Icon && database.Icon.Type === 'file') {
   </head>
   <body>
     <GoogleAnalytics trackingId={PUBLIC_GA_TRACKING_ID} />
-    <div class="container">
-      <header>
+      <!-- <header>
         {
           coverImageURL && (
             <div class="cover">
@@ -86,24 +102,21 @@ if (database.Icon && database.Icon.Type === 'file') {
             </div>
           )
         }
-      </header>
-
-      <div>
-        <main>
-          <div class="content">
-            <header>
+      </header> -->
+          <header>
+            <div>
               <h1>
                 <a href={getNavLink('/')}>
                   {
                     database.Icon && database.Icon.Type === 'emoji' ? (
                       <>
                         <span>{database.Icon.Emoji}</span>
-                        {database.Title}
+                        {/* {database.Title} */}
                       </>
                     ) : database.Icon && database.Icon.Type === 'external' ? (
                       <>
                         <img src={database.Icon.Url} alt="Site icon image" />
-                        {database.Title}
+                        {/* {database.Title} */}
                       </>
                     ) : database.Icon && database.Icon.Type === 'file' ? (
                       <>
@@ -112,7 +125,7 @@ if (database.Icon && database.Icon.Type === 'file') {
                           class="custom-icon"
                           alt="Site icon image"
                         />
-                        {database.Title}
+                        {/* {database.Title} */}
                       </>
                     ) : (
                       database.Title
@@ -120,11 +133,30 @@ if (database.Icon && database.Icon.Type === 'file') {
                   }
                 </a>
               </h1>
-              <div class="description">
+            </div>
+            <div>
+              <nav class="header__nav nav" id="js-nav">
+                <ul class="nav__items nav-items">
+                  <li class="nav-items__item">
+                    <ClapLink />
+                    <BlogTagsLink heading="カテゴリー" tags={tags} />
+                    <SearchButton />
+                    <Profile heading="書いてる人"  />
+                  </li>
+                </ul>
+              </nav>
+              <button class="header__hamburger hamburger" id="js-hamburger">
+                <Hamburger />
+              </button>
+            </div>
+              <!-- <div class="description">
                 {database.Description}
-              </div>
-            </header>
-
+              </div> -->
+          </header>
+    <div class="container">
+      <div>
+        <main>
+              <div class="content">
             <slot name="main" />
 
             <footer>
@@ -138,12 +170,14 @@ if (database.Icon && database.Icon.Type === 'file') {
           </div>
         </main>
 
-        <aside>
+        <!-- <aside>         
           <SearchButton />
           <slot name="aside" />
-        </aside>
+        </aside> -->
       </div>
-    </div>
+      </div>
+
+    <script src={getStaticFilePath('/scripts/menu.js')} />
 
     <SearchModal />
     {
@@ -180,7 +214,19 @@ if (database.Icon && database.Icon.Type === 'file') {
     }
   }
 
-  aside {
+  header {
+    padding: 20px 20px;
+    color: #fff;
+    background-color: #FFD01E;
+    display:flex;
+    justify-content: space-between;
+    height: 70px;
+  }
+  header a {
+    color: #fff;
+  }
+
+  /* aside {
     order: 1;
     width: 300px;
     padding: 20px 20px;
@@ -191,7 +237,7 @@ if (database.Icon && database.Icon.Type === 'file') {
       order: 2;
       width: 100%;
     }
-  }
+  } */
 
   div.cover {
   }
@@ -354,6 +400,99 @@ if (database.Icon && database.Icon.Type === 'file') {
     color: var(--fg);
     font-size: 2rem;
     font-weight: 700;
+  }
+  /* ヘッダーのナビ部分 */
+  /* @media (max-width: 640px) {
+    .header__nav {
+      display: none;
+    }
+    .header__nav.active {
+      display: block;
+    }
+  } */
+  .header__nav {
+    position: absolute;
+    right: 0;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100vh;
+    transform: translateX(100%); 
+    background-color: #FFD01E; /*ハンバーガーメニュークリック時のナビゲーションメニュー背景色*/
+    transition: ease .4s; /*ハンバーガーメニュークリック時のナビゲーションメニュー出現を遅延*/
+  }
+  .nav-items {
+    padding-top: 80px;
+    padding-bottom: 200px;
+    list-style-type: none;
+  }
+
+  /* ナビのリンク */
+  .nav-items__item a {
+    color: black;
+    width: 90%;
+    display: block;
+    text-align: start;
+    font-size: 0.9rem;
+    margin-bottom: 24px;
+  }
+
+  .nav-items__item:last-child a {
+    margin-bottom: 0;
+  }
+
+  /* ハンバーガーメニュー */
+  .header__hamburger {
+    width: 48px;
+    height: 100%;
+  }
+
+  .hamburger {
+    background-color: transparent; /*buttonタグデフォルトスタイルを打ち消し*/
+    border-color: transparent; /*buttonタグデフォルトスタイルを打ち消し*/
+    z-index: 9999;
+  }
+
+  /* ハンバーガーメニューの線 */
+  .hamburger span {
+    width: 100%;
+    height: 3px;
+    background-color: #fff;
+    position: relative;
+    transition: ease .4s; /*ハンバーガーメニュークリック時の三本線の動きを遅延*/
+    display: block;
+    border-radius: 2px;
+  }
+
+  .hamburger span:nth-child(1) {
+    top: 0;
+  }
+
+  .hamburger span:nth-child(2) {
+    margin: 8px 0;
+  }
+
+  .hamburger span:nth-child(3) {
+    top: 0;
+  }
+
+  /* ハンバーガーメニュークリック後のスタイル */
+  .header__nav.active {
+    transform: translateX(0);
+  }
+
+  .hamburger.active span:nth-child(1) {
+    top: 5px;
+    transform: rotate(45deg);
+  }
+
+  .hamburger.active span:nth-child(2) {
+    opacity: 0;
+  }
+
+  .hamburger.active span:nth-child(3) {
+    top: -17px;
+    transform: rotate(-45deg);
   }
 
   @media (max-width: 640px) {

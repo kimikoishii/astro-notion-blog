@@ -1,0 +1,57 @@
+---
+import NoContents from './NoContents.astro'
+
+export interface Props {
+  heading: string
+}
+
+const { heading } = Astro.props
+---
+
+<div class="profile">
+    <h2>{heading}</h2>
+    <div>剃毛moon</div>
+    <a
+        href="https://www.pixiv.net/users/386955"
+    >Pixiv&#x1faa3; 
+</a>
+</div>
+
+<style>
+  .profile div{
+    display: block;
+    font-size: 0.9rem;
+    padding-left: 0.4rem;
+  }
+  .profile h2 {
+    margin: 0;
+    padding-left: 0.4rem;
+    color: #000;
+    font-size: 0.95rem;
+  }
+  .profile a {
+    display: block;
+    border-radius: var(--radius);
+    padding: 0.1rem 1rem;
+    line-height: 1.0rem;
+    color: #fff;
+    /* background-color: #fff; */
+    font-size: 0.95rem;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    width: fit-content;
+  }
+  .profile a span,
+  .profile a img {
+    display: inline-block;
+    margin-right: 0.2rem;
+  }
+  /* .profile a img {
+    width: 1.25rem;
+    height: 1.25rem;
+    vertical-align: sub;
+  } */
+</style>
+
+

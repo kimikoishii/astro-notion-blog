@@ -25,6 +25,7 @@ import PostRelativeLink from '../../components/PostRelativeLink.astro'
 import BlogPostsLink from '../../components/BlogPostsLink.astro'
 import BlogTagsLink from '../../components/BlogTagsLink.astro'
 import styles from '../../styles/blog.module.css'
+import ClapLink from  '../../components/ClapLink.astro'
 
 export async function getStaticPaths() {
   const posts = await getAllPosts()
@@ -105,23 +106,20 @@ if (post.FeaturedImage && post.FeaturedImage.Url) {
       <PostTags post={post} />
       <PostTitle post={post} enableLink={false} />
       <PostBody blocks={blocks} />
-      <PostTags post={post} />
 
       <footer>
+        <ClapLink />
         <PostRelativeLink prevPost={prevPost} nextPost={nextPost} />
       </footer>
     </div>
   </div>
 
-  <div slot="aside" class="aside">
-    <BlogPostsLink
-      heading="Posts in the same category"
-      posts={postsHavingSameTag.filter(
-        (p: interfaces.Post) => p.Slug !== post.Slug
-      )}
-    />
-    <BlogPostsLink heading="Recommended" posts={rankedPosts} />
-    <BlogPostsLink heading="Latest posts" posts={recentPosts} />
+  <!-- <div slot="aside" class={styles.aside}>
+    <ClapLink />
     <BlogTagsLink heading="Categories" tags={tags} />
-  </div>
+    <SearchButton />
+  </div> -->
 </Layout>
+
+
+

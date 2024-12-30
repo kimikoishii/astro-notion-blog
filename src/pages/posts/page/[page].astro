@@ -18,6 +18,8 @@ import Pagination from '../../../components/Pagination.astro'
 import BlogPostsLink from '../../../components/BlogPostsLink.astro'
 import BlogTagsLink from '../../../components/BlogTagsLink.astro'
 import styles from '../../../styles/blog.module.css'
+import ClapLink from  '../../../components/ClapLink.astro'
+import SearchButton from '../../../components/SearchButton.astro'
 
 export async function getStaticPaths() {
   const numberOfPages = await getNumberOfPages()
@@ -70,10 +72,11 @@ const [posts, rankedPosts, tags, numberOfPages] = await Promise.all([
     </footer>
   </div>
 
-  <div slot="aside" class={styles.aside}>
-    <BlogPostsLink heading="Recommended" posts={rankedPosts} />
+  <!-- <div slot="aside" class={styles.aside}>
+    <ClapLink />
     <BlogTagsLink heading="Categories" tags={tags} />
-  </div>
+    <SearchButton />
+  </div> -->
 </Layout>
 
 <style>
